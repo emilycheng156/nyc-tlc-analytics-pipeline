@@ -55,6 +55,22 @@ Data source:
 https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
 
 ---
+# Raw Data
+
+Raw NYC TLC parquet datasets are not included because of file size.
+
+Download public NYC TLC trip records from:
+
+https://www.nyc.gov/site/tlc/about/tlc-trip-record-data.page
+
+Expected folders:
+
+- data/raw/yellow/
+- data/raw/green/
+- data/raw/fhv/
+- data/raw/hvfhv/
+
+---
 
 ## Analytical Outputs
 
@@ -85,7 +101,7 @@ Key processing:
 
 ### 2. Yearly Market Share Analysis (`yearly_market_share.csv`)
 
-Used to analyze transportation market composition over time.
+Used to analyze how NYC transportation market composition changed over time, particularly the growth of ride-hail relative to traditional taxi services.
 
 Includes:
 
@@ -94,12 +110,21 @@ Includes:
 - trip counts
 - market share percentages
 
+Key analytical challenge:
+
+NYC TLC data began reporting High-Volume For-Hire Vehicle (HVFHV) trips as a separate dataset in 2019. Before that, ride-hail trips from services such as Uber and Lyft were mixed into the broader FHV dataset, making direct year-over-year comparisons difficult.
+
+To create a consistent historical market share analysis, this pipeline reconstructs pre-2019 ride-hail activity by identifying dispatching base numbers associated with high-volume operators (e.g., Uber, Lyft, Via, Juno) from the dedicated HVFHV dataset and using those identifiers to classify older FHV trip records as either:
+
+- `hvfhv` (ride-hail / high-volume for-hire)
+- `other_fhv` (traditional for-hire vehicle activity)
+
 Key processing:
 
-- aggregate trips by year and vehicle category
-- separate ride-hail/high-volume FHV trips from other FHV activity
+- aggregate trip counts by year and vehicle category
+- reconstruct pre-2019 ride-hail classifications from mixed FHV records
 - calculate annual market share proportions
-- enforce consistent output structure across years
+- enforce consistent output structure across all years for downstream comparison
 
 ---
 
